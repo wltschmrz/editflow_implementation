@@ -1,0 +1,65 @@
+# base_mode: ["random","shuffle","background"]
+base_mode: ["random"]
+
+min_len: 150
+max_len: 250
+
+vocab: 4
+
+special_tokens:
+  BOS: "BOS"
+  PAD: "PAD"
+  EPS0: "EPS0"
+  EPS1: "EPS1"
+
+train:
+  batch_size: 64
+  lr: 0.0001
+  num_steps: 200000
+  grad_clip: 1.0
+  save_every: 1000
+  log_memoryless_every: 1000   # diagnostics frequency (steps)
+
+model:
+  d_model: 512
+  n_heads: 8
+  n_layers: 12
+  dropout: 0.1
+
+# Memoryless base generator for SOC / reward-tilting compatibility
+# Q_base(t) = Q_edit(t) + gamma(t) Q_mix
+memoryless:
+  enabled: true
+
+  schedule:
+    type: piecewise_cosine
+    t0: 0.1
+    t1: 0.8
+
+  auto_scale:
+    k_ratio: 30.0
+    reduce: mean
+    gamma_min: 0.0
+    gamma_max: 300.0
+
+  mix_rates:
+    ins: 0.2
+    del: 0.2
+    sub: 5.0
+
+
+  # token distribution for mixing (uniform over DNA vocab)
+  mix_q: uniform
+
+eval:
+  atac_hepg2_index: 0
+  every_steps: 1000
+  n_samples: 256
+
+  sampler:
+    num_steps: 128
+    temperature: 1.0
+    min_len: 150
+    max_len: 250
+    init_mode: "random"
+    init_len: 100

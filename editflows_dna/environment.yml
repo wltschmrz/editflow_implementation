@@ -1,0 +1,21 @@
+# environment.yml
+name: editflows
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - scipy
+  - pandas
+  - scikit-learn
+  - pyyaml
+  - tqdm
+  - pytorch>=2.2
+  - pytorch-cuda=12.1   # 서버 CUDA에 맞춰 수정
+  - pip:
+      - wandb
+      - biopython
+      - pyfaidx

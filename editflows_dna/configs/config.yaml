@@ -1,0 +1,44 @@
+#base_mode: ["random","shuffle","background"]
+base_mode: ["random"]
+
+
+min_len: 150
+max_len: 250
+
+vocab: 4
+
+special_tokens:
+  BOS: "BOS"
+  PAD: "PAD"
+  EPS0: "EPS0"
+  EPS1: "EPS1"
+
+train:
+  batch_size: 128
+  lr: 0.0003
+  num_steps: 200000
+  grad_clip: 1.0
+  alpha_rate_reg: 0.001
+  save_every: 2500
+  keep_last_n: 8
+  t_min: 0.001
+  t_max: 0.999
+
+model:
+  d_model: 512
+  n_heads: 8
+  n_layers: 12
+  dropout: 0.1
+
+eval:
+  atac_hepg2_index: 0
+  every_steps: 2500
+  n_samples: 256
+
+  sampler:
+    num_steps: 128
+    temperature: 1.0
+    min_len: 150
+    max_len: 250
+    init_mode: "random"
+    init_len: 100

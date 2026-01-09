@@ -9,5 +9,6 @@ __pycache__/
 *.log
 *.mp4
 *.pt
+*.fa
 
 # ours

@@ -1,0 +1,81 @@
+# base_mode: ["random","shuffle","background"]
+base_mode: ["random"]
+
+min_len: 150
+max_len: 250
+
+vocab: 4
+
+special_tokens:
+  BOS: "BOS"
+  PAD: "PAD"
+  EPS0: "EPS0"
+  EPS1: "EPS1"
+
+train:
+  batch_size: 64
+  lr: 0.0001
+  num_steps: 200000
+  grad_clip: 1.0
+  save_every: 100
+  log_memoryless_every: 100   # diagnostics frequency (steps)
+
+model:
+  d_model: 512
+  n_heads: 8
+  n_layers: 12
+  dropout: 0.1
+
+# Memoryless base generator for SOC / reward-tilting compatibility
+# Q_base(t) = Q_edit(t) + gamma(t) Q_mix
+memoryless:
+  enabled: true
+
+  schedule:
+    type: piecewise_cosine
+    t0: 0.1
+    t1: 0.5
+
+  # auto-scale gamma_hi so that (early) mixing total rate ~= k_ratio * edit total rate
+  auto_scale:
+    k_ratio: 10.0
+    reduce: mean
+    gamma_min: 0.0
+    gamma_max: 50.0
+
+  # unit mixing kernel rates (state-independent)
+  mix_rates:
+    ins: 0.5
+    del: 0.5
+    sub: 1.0
+
+  # token distribution for mixing (uniform over DNA vocab)
+  mix_q: uniform
+
+eval:
+  atac_hepg2_index: 0
+  every_steps: 100
+  n_samples: 300
+
+  sampler:
+    num_steps: 128
+    temperature: 1.0
+    min_len: 150
+    max_len: 250
+    init_mode: "random"
+    init_len: 100
+
+soc:
+  # Doob/value-difference SOC fine-tuning settings (base model is frozen)
+  batch_size: 64
+  num_steps: 128
+  init_len: 200   # recommend within [min_len,max_len] to avoid extra normalization noise
+  min_len: 150
+  max_len: 250
+  temperature: 1.0
+
+  num_updates: 20000
+  lr: 0.0001
+  beta_kl: 0.1
+  baseline_ema: 0.95
+  grad_clip: 1.0
